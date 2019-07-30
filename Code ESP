@@ -1,0 +1,537 @@
+ #include <Wire.h>
+
+#include <Adafruit_PWMServoDriver.h>
+
+Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
+
+#include <DNSServer.h>
+
+#include <ESPUI.h>
+
+#include <EEPROM.h>
+
+const byte DNS_PORT = 53;
+
+IPAddress apIP(192, 168, 1, 1);
+
+DNSServer dnsServer;
+
+#if defined(ESP32)
+
+#include <WiFi.h>
+
+#else
+
+#include <ESP8266WiFi.h>
+
+#endif
+
+const char *ssid = "ESP";
+
+const char *password = "";
+
+const int  usedPins = 16;
+
+//------------------------ EEPROM Funktionen: -------------------------
+
+const int pinreg[16] = {10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40};
+
+const int status_reg = 8;
+
+const double LED_Matrix[4][4] =  {{5 ,5  ,5    ,5},
+
+                                  {5   ,5  ,5  ,5},
+
+                                  {5 ,5  ,5    ,5},
+
+                                  {5   ,5  ,5  ,5}};
+
+void setPinValue(int pin, int value){
+
+  if(value==1){value = 0;}
+
+    EEPROM.write(pinreg[pin],value);
+
+}
+
+int getPinValue(int pin){
+
+  return EEPROM.read(pinreg[pin]);
+
+}
+
+void setstatus(byte value){
+
+  EEPROM.write(status_reg,value);
+
+}
+
+int getstatus(){
+
+  return EEPROM.read(status_reg);
+
+}
+
+void setZero(){
+
+  int i = 0;
+
+  while(i<usedPins){
+
+      pwm.setPin(i,0);   
+
+      //EEPROM.write(pinreg[i],0);  
+
+      Serial.print("LED");
+
+      Serial.print(i);
+
+      Serial.print(" to ");
+
+      Serial.print(0);
+
+      Serial.print(" - ");
+
+      i++;
+
+  }
+
+}
+
+//-------------------- Hilfsfunktionen -----------------------
+
+void pinupdate(){
+
+  int i=0;
+
+  if(getstatus()){
+
+    while(i<usedPins){
+
+      pwm.setPin(i,getPinValue(i)*8.192*getRange(i));
+
+      Serial.print("LED");
+
+      Serial.print(i);
+
+      Serial.print(" to ");
+
+      Serial.print(getPinValue(i)*8.192*getRange(i));
+
+      Serial.print(" - ");
+
+      i++;
+
+      delay(10);
+
+    }
+
+  }else{
+
+      setZero();
+
+  }
+
+  Serial.println();
+
+}
+
+double getRange(int i){
+
+  int line = i / 4;
+
+  int column  = i % 4;
+
+  return LED_Matrix[line][column];
+
+}
+
+void lightUp(){
+
+int i=0;
+
+int k=1;
+
+Serial.print("lightup");
+
+  while(k<101){   
+
+    while(i<usedPins){
+
+      pwm.setPin(i,getPinValue(i)*8.192*getRange(i)*k/100);
+
+      i++;
+
+    }
+
+//  if(k<100){
+
+//    for (long l = 0; l <= 150; l++) {
+
+//      Serial.print(".");          //just a delay!
+
+//    }
+
+//  }
+
+  k++;
+
+  i=0;  
+
+  }    
+
+}
+
+//-------------------- gui Funktionen ---------------------------
+
+void onoff(Control sender, int value){
+
+  switch (value) {
+
+    case S_ACTIVE:
+
+      setstatus(1);
+
+      lightUp();
+
+      Serial.println("on");
+
+      break;
+
+    case S_INACTIVE:
+
+      setstatus(0);
+
+      Serial.println("off");
+
+      break;
+
+  }
+
+  pinupdate();
+
+  
+
+  String beg = "LED";
+
+  int i = 0;
+
+  while(i<usedPins){
+
+    String str = beg + String(i);
+
+    ESPUI.updateSlider(str, getPinValue(i));   
+
+    i++;
+
+  }
+
+}
+
+void slider0( Control sender, int type) {
+
+  setPinValue(0,sender.value.toInt());
+
+//  setPinValue(1,sender.value.toInt());
+
+//  setPinValue(2,sender.value.toInt());
+
+//  setPinValue(3,sender.value.toInt());
+
+//  setPinValue(4,sender.value.toInt());
+
+//  setPinValue(5,sender.value.toInt());
+
+//  setPinValue(6,sender.value.toInt());
+
+//  setPinValue(7,sender.value.toInt());
+
+//  setPinValue(8,sender.value.toInt());
+
+//  setPinValue(9,sender.value.toInt());
+
+//  setPinValue(10,sender.value.toInt());
+
+//  setPinValue(11,sender.value.toInt());
+
+//  setPinValue(12,sender.value.toInt());
+
+//  setPinValue(13,sender.value.toInt());
+
+//  setPinValue(14,sender.value.toInt());
+
+//  setPinValue(15,sender.value.toInt());
+
+//  Serial.println(sender.value.toInt());
+
+  pinupdate();
+
+}
+
+void slider1(Control sender, int type) {
+
+  setPinValue(1,sender.value.toInt());
+
+  Serial.println(sender.value.toInt());
+
+  pinupdate();
+
+}
+
+void slider2(Control sender, int type) {
+
+  setPinValue(2,sender.value.toInt());
+
+  Serial.println(sender.value.toInt());
+
+  pinupdate();
+
+}
+
+ void slider3(Control sender, int type) {
+
+  setPinValue(3,sender.value.toInt());
+
+  Serial.println(sender.value.toInt());
+
+  pinupdate();
+
+}
+
+void slider4(Control sender, int type) {
+
+  setPinValue(4,sender.value.toInt());
+
+  Serial.println(sender.value.toInt());
+
+  pinupdate();
+
+}
+
+void slider5(Control sender, int type) {
+
+  setPinValue(5,sender.value.toInt());
+
+  Serial.println(sender.value.toInt());
+
+  pinupdate();
+
+}
+
+void slider6(Control sender, int type) {
+
+  setPinValue(6,sender.value.toInt());
+
+  Serial.println(sender.value.toInt());
+
+  pinupdate();
+
+}
+
+void slider7(Control sender, int type) {
+
+  setPinValue(7,sender.value.toInt());
+
+  Serial.println(sender.value.toInt());
+
+  pinupdate();
+
+}
+
+void slider8(Control sender, int type) {
+
+  setPinValue(8,sender.value.toInt());
+
+  Serial.println(sender.value.toInt());
+
+  pinupdate();
+
+}
+
+void slider9(Control sender, int type) {
+
+  setPinValue(9,sender.value.toInt());
+
+  Serial.println(sender.value.toInt());
+
+  pinupdate();
+
+}
+
+void slider10(Control sender, int type) {
+
+  setPinValue(10,sender.value.toInt());
+
+  Serial.println(sender.value.toInt());
+
+  pinupdate();
+
+}
+
+void slider11(Control sender, int type) {
+
+  setPinValue(11,sender.value.toInt());
+
+  Serial.println(sender.value.toInt());
+
+  pinupdate();
+
+}
+
+void slider12(Control sender, int type) {
+
+  setPinValue(12,sender.value.toInt());
+
+  Serial.println(sender.value.toInt());
+
+  pinupdate();
+
+}
+
+void slider13(Control sender, int type) {
+
+  setPinValue(13,sender.value.toInt());
+
+  Serial.println(sender.value.toInt());
+
+  pinupdate();
+
+}
+
+void slider14(Control sender, int type) {
+
+  setPinValue(14,sender.value.toInt());
+
+  Serial.println(sender.value.toInt());
+
+  pinupdate();
+
+}
+
+void slider15(Control sender, int type) {
+
+  setPinValue(15,sender.value.toInt());
+
+  Serial.println(sender.value.toInt());
+
+  pinupdate();
+
+}
+
+//----------------------------------------------   setup   ------------------------
+
+void setup(void) {
+
+  pwm.begin();
+
+  pwm.setPWMFreq(100); 
+
+  Serial.begin(115200);
+
+  EEPROM.begin(4096); 
+
+  delay(1000);
+
+  
+
+  //----------------------------------------------------------------------
+
+  WiFi.mode(WIFI_AP);
+
+  WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
+
+  
+
+  #if defined(ESP32)
+
+    WiFi.setHostname(ssid);
+
+  #else
+
+    WiFi.hostname(ssid);
+
+  #endif
+
+  WiFi.softAP(ssid);
+
+  // WiFi.softAP(ssid, password);
+
+  Serial.println("");
+
+  Serial.print("IP address: ");
+
+  Serial.println(WiFi.softAPIP());
+
+  // change the beginning to this if you want to join an existing network--
+
+//     WiFi.begin(ssid, password);
+
+//     Serial.println("");
+
+//     // Wait for connection
+
+//     while (WiFi.status() != WL_CONNECTED) {
+
+//     delay(500);
+
+//     Serial.print(".");
+
+//     }
+
+//     Serial.println("");
+
+//     Serial.print("IP address: ");
+
+//     Serial.println(WiFi.localIP());
+
+//     
+
+   //---------------------------------------------------------------------
+
+  ESPUI.switcher("Switch 0n/0ff", false, &onoff, COLOR_NONE);
+
+  ESPUI.slider("LED0", &slider0, COLOR_ALIZARIN, "30");
+
+  ESPUI.slider("LED1", &slider1, COLOR_ALIZARIN, "30");
+
+  ESPUI.slider("LED2", &slider2, COLOR_ALIZARIN, "30");
+
+  ESPUI.slider("LED 3", &slider3, COLOR_ALIZARIN, "30");
+
+  ESPUI.slider("LED 4", &slider4, COLOR_ALIZARIN, "30");
+
+  ESPUI.slider("LED 5", &slider5, COLOR_ALIZARIN, "30");
+
+  ESPUI.slider("LED 6", &slider6, COLOR_ALIZARIN, "30");
+
+  ESPUI.slider("LED 7", &slider7, COLOR_ALIZARIN, "30");
+
+  ESPUI.slider("LED 8", &slider8, COLOR_ALIZARIN, "30");
+
+  ESPUI.slider("LED 9", &slider9, COLOR_ALIZARIN, "30");
+
+  ESPUI.slider("LED 10", &slider10, COLOR_ALIZARIN, "30");
+
+  ESPUI.slider("LED 11", &slider11, COLOR_ALIZARIN, "30");
+
+  ESPUI.slider("LED 12", &slider12, COLOR_ALIZARIN, "30");
+
+  ESPUI.slider("LED 13", &slider13, COLOR_ALIZARIN, "30");
+
+  ESPUI.slider("LED 14", &slider14, COLOR_ALIZARIN, "30");
+
+  ESPUI.slider("LED 15", &slider15, COLOR_ALIZARIN, "30");
+
+  dnsServer.start(DNS_PORT, "*", apIP);
+
+  ESPUI.begin("ESPUI Control");
+
+  setstatus(0);
+
+}
+
+void loop() {
+
+dnsServer.processNextRequest();
+
+}
