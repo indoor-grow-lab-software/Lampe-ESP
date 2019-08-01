@@ -1,7 +1,10 @@
  #include <Wire.h>
 
 #include <Adafruit_PWMServoDriver.h>
-die welt ist schöndnsServer;
+
+Hallo Welt
+
+DNSServer dnsServer;
 
 #if defined(ESP32)
 
