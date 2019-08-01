@@ -2,7 +2,17 @@
 
 #include <Adafruit_PWMServoDriver.h>
 
-Hallo Welt
+Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
+
+#include <DNSServer.h>
+
+#include <ESPUI.h>
+
+#include <EEPROM.h>
+
+const byte DNS_PORT = 53;
+
+IPAddress apIP(192, 168, 1, 1);
 
 DNSServer dnsServer;
 
