@@ -1,2 +1,2 @@
-# Lampe-ESP
-Die Software zur steuerung der Lampe über den ESP
+# Lampen-Kontrollsoftware
+Die gesamte Software zur steuerung der Lampe.
