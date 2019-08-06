@@ -1,4 +1,4 @@
-#include <Wire.h>
+ #include <Wire.h>
 
 #include <Adafruit_PWMServoDriver.h>
 
@@ -38,13 +38,13 @@ const int pinreg[16] = {10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40};
 
 const int status_reg = 8;
 
-const double LED_Matrix[4][4] =  {{5 ,5  ,5    ,5},
+const double LED_Matrix[4][4] =  {{3.3 ,3.3  ,3.3    ,3.3},
 
-                                  {5   ,5  ,5  ,5},
+                                  {3.3   ,3.3  ,3.3  ,3.3},
 
-                                  {5 ,5  ,5    ,5},
+                                  {3.3 ,3.3  ,3.3    ,3.3},
 
-                                  {5   ,5  ,5  ,5}};
+                                  {3.3   ,3.3  ,3.3  ,3.3}};
 
 void setPinValue(int pin, int value){
 
