@@ -1,8 +1,21 @@
-# Die Klasse LED erstellt.
-class LED:
+# Die Klasse Lampe erstellt.
 
 
-    def __init__(self, name, farbe, helligkeit):
+class Lampe:
+
+
+    def __init__(self, LEDs = []):
+        self.LEDs = LEDs
+
+#    def update(self):
+
+
+
+
+class LED(Lampe):
+
+
+    def __init__(self, name, farbe, helligkeit = 0):
         """
 
         :param name: Der Name der LED z.b. 1 oder eins
@@ -21,13 +34,14 @@ class LED:
         :return: die aktuellen Parameter der LED
         """
         #Die aktuellen Werte einer LED werden in Form eine dictionarys zurück gegeben.
+
         return {objekt.name: "Name", objekt.farbe : "Farbe", objekt.helligkeit : "Helligkeit"}
 
-#    def update(self):
 
 
 
 
+B = LED(1,2)
+A =  Lampe([1,2,3,4])
 
-
-
+print(A.LEDs,B.name)
