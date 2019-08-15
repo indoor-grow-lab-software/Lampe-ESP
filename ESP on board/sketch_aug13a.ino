@@ -5,21 +5,28 @@
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();  //KLasse pwm in PWM lib.
 
 
-void setup(){
+void setup() {
   pwm.begin();
   pwm.setPWMFreq(100); //max 1600Hz
   Serial.begin(115200);
-  
-  start("EPS2",""); // Wifi details connec to
+
+  start("EPS2", ""); // Wifi details connec to
 }
 
-void loop(){
+void loop() {
   waitUntilNewReq();  //Waits until a new request from python come
-
-  if (getPath()=="/OPEN_LED"){
-      for (int i=0;i<16;i++){pwm.setPin(i,2000);}  // reset all pins to zero
+  magnitude, value = strtok(getPath(),"_")
+  if (magnitude == "/FRQ") {
+    pwm.setPWMFreq(int(value))  // reset all pins to 2000
   }
-  if (getPath()=="/CLOSE_LED"){
-      for (int i=0;i<16;i++){pwm.setPin(i,0);}  // reset all pins to zero
+  elif (magnitude == "/HEL") {
+    for (int i = 0; i < 16; i++) {
+      pwm.setPin(i, int(value)); // reset all pins to 2000
+    }
+  }
+  if (magnitude == "/SET") {
+    for (int i = 0; i < 16; i++) {
+      pwm.setPin(i, int(value)); // reset all pins to zero
+    }
   }
 }
